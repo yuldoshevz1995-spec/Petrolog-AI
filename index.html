@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Petrolog AI — demo prototip v0.1</title>
+<style>
+:root{
+  --bg:#0e1117; --panel:#161b25; --panel2:#1d2430; --line:#2a3342;
+  --txt:#e6edf3; --muted:#8b98a9; --acc:#4a9eff; --acc2:#00c48c; --warn:#f2b544;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
+header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;background:var(--panel)}
+.logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#08121f}
+h1{font-size:17px;margin:0}
+.sub{color:var(--muted);font-size:12px;margin-top:2px}
+.badge{margin-left:auto;font-size:11px;padding:4px 10px;border:1px solid var(--warn);color:var(--warn);border-radius:20px}
+.wrap{display:grid;grid-template-columns:330px 1fr;gap:0;min-height:calc(100vh - 75px)}
+.side{background:var(--panel);border-right:1px solid var(--line);padding:18px;overflow:auto}
+.main{padding:22px;overflow:auto}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:16px;margin-bottom:16px}
+label.lbl{display:block;font-size:12px;color:var(--muted);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:22px 12px;text-align:center;color:var(--muted);cursor:pointer;transition:.15s;font-size:13px}
+.drop:hover{border-color:var(--acc);color:var(--acc)}
+.drop.has{border-color:var(--acc2);color:var(--acc2)}
+select,textarea,input{width:100%;background:#0c1119;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px;font-family:inherit;font-size:13px}
+textarea{min-height:92px;resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
+button{width:100%;margin-top:16px;padding:12px;border:0;border-radius:9px;background:var(--acc);color:#04101f;font-weight:700;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.1)} button:disabled{opacity:.4;cursor:not-allowed}
+.btn2{background:transparent;border:1px solid var(--line);color:var(--txt);font-weight:500;margin-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+canvas{width:100%;border-radius:8px;display:block;background:#000}
+h3{font-size:13px;margin:0 0 12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid #1e2634}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+.bar{height:6px;background:#0c1119;border-radius:4px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--acc)}
+.conf{font-size:11px;padding:2px 7px;border-radius:20px;font-weight:600}
+.c-hi{background:rgba(0,196,140,.15);color:var(--acc2)}
+.c-md{background:rgba(242,181,68,.15);color:var(--warn)}
+.c-lo{background:rgba(255,90,90,.15);color:#ff5a5a}
+.empty{color:var(--muted);text-align:center;padding:70px 20px;font-size:14px;line-height:1.7}
+.note{font-size:12px;color:var(--muted);line-height:1.6;background:rgba(242,181,68,.07);border-left:3px solid var(--warn);padding:10px 12px;border-radius:0 6px 6px 0;margin-top:12px}
+.kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1e2634;font-size:13px}
+.kv b{font-weight:600}
+.tag{display:inline-block;font-size:11px;background:#0c1119;border:1px solid var(--line);padding:3px 9px;border-radius:20px;margin:0 6px 6px 0;color:var(--muted)}
+.txtrep{white-space:pre-wrap;line-height:1.75;font-size:13.5px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.25);border-top-color:#04101f;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;margin-right:8px}
+@keyframes s{to{transform:rotate(360deg)}}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">PAI</div>
+  <div>
+    <h1>Petrolog AI</h1>
+    <div class="sub">Sun'iy intellekt asosida petrografik-petrologik tahlil platformasi</div>
+  </div>
+  <div class="badge">DEMO PROTOTIP v0.1</div>
+</header>
+
+<div class="wrap">
+  <!-- ==== CHAP PANEL ==== -->
+  <div class="side">
+    <div class="card" style="margin-bottom:14px">
+      <h3>1. Ma'lumot yuklash</h3>
+
+      <label class="lbl">Shlif tasviri (o'tgan nur)</label>
+      <div class="drop" id="d1">Rasm tanlash yoki tashlash<br><small>JPG / PNG / TIFF</small></div>
+      <input type="file" id="f1" accept="image/*" hidden>
+
+      <label class="lbl">Anshlif tasviri (qaytgan nur)</label>
+      <div class="drop" id="d2">Ixtiyoriy<br><small>JPG / PNG</small></div>
+      <input type="file" id="f2" accept="image/*" hidden>
+
+      <label class="lbl">ICP-MS natijalari</label>
+      <textarea id="icp" placeholder="Element,Qiymat,Birlik&#10;SiO2,62.4,%&#10;Al2O3,15.8,%&#10;Fe2O3,5.2,%&#10;CaO,4.1,%&#10;Na2O,3.6,%&#10;K2O,2.9,%&#10;MgO,2.4,%&#10;Cu,340,ppm&#10;Au,0.8,ppm"></textarea>
+      <div class="tag" id="tagIcp">0 ta element</div>
+    </div>
+
+    <div class="card">
+      <h3>2. Tahlil parametrlari</h3>
+      <label class="lbl">Tahlil rejimi</label>
+      <select id="mode">
+        <option value="complex">Kompleks tahlil (barcha manbalar)</option>
+        <option value="thin">Faqat shlif tavsifi</option>
+        <option value="pol">Faqat anshlif tavsifi</option>
+        <option value="geo">Faqat ICP-MS geokimyoviy tahlil</option>
+      </select>
+
+      <label class="lbl">Kutilayotgan litologik guruh</label>
+      <select id="lith">
+        <option value="auto">Avtomatik aniqlash</option>
+        <option value="magm">Magmatik (intruziv)</option>
+        <option value="volc">Vulkanogen (effuziv)</option>
+        <option value="sed">Cho'kindi</option>
+        <option value="meta">Metamorfik</option>
+        <option value="ore">Ma'danli / skarn</option>
+      </select>
+
+      <label class="lbl">Fazalar soni (segmentatsiya)</label>
+      <select id="kk">
+        <option value="4">4 faza</option>
+        <option value="5" selected>5 faza</option>
+        <option value="6">6 faza</option>
+        <option value="7">7 faza</option>
+      </select>
+
+      <label class="lbl">Namuna raqami</label>
+      <input id="sid" placeholder="masalan: GGI-2026-001" value="GGI-2026-001">
+
+      <button id="run" disabled>Tahlilni boshlash</button>
+      <button class="btn2" id="dl" disabled>Hisobotni yuklab olish</button>
+    </div>
+  </div>
+
+  <!-- ==== ASOSIY PANEL ==== -->
+  <div class="main" id="main">
+    <div class="empty">
+      Chap paneldan shlif tasvirini yuklang va <b>"Tahlilni boshlash"</b> tugmasini bosing.<br>
+      <span style="font-size:12.5px;color:#6b7789">Demo rejimida tahlil to'liq brauzer ichida, serversiz bajariladi.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   Petrolog AI — demo tahlil yadrosi (v0.1)
+   Segmentatsiya: k-means (RGB + HSV + lokal tekstura)
+   Mineral moslashtirish: optik xossalar bo'yicha reference jadval
+   ESLATMA: bu bosqichda CNN o'qitilmagan. Bu — tayyor MVP karkasi.
+   ========================================================= */
+
+const REF = {
+  thin: [ // shlif — o'tgan nurda
+    {n:'Kvars',            h:[0,360], s:[0,.14], v:[.55,1],   tex:[0,.35], note:'rangsiz, relyef past, to\'lqinsimon so\'nish'},
+    {n:'Plagioklaz',       h:[0,360], s:[0,.18], v:[.45,.95], tex:[.15,.7],note:'polisintetik dvoyniklanish, rangsiz'},
+    {n:'Kaliyli dala shpati',h:[20,60],s:[.05,.3],v:[.5,.95], tex:[.1,.6], note:'sarg\'ish, past relyef, pertit'},
+    {n:'Biotit',           h:[15,45], s:[.35,1], v:[.2,.6],   tex:[.2,1],  note:'kuchli pleoxroizm, jigarrang-qora'},
+    {n:'Amfibol (rogovaya obmanka)',h:[70,170],s:[.25,1],v:[.15,.6],tex:[.2,1],note:'yashil-jigarrang pleoxroizm'},
+    {n:'Piroksen',         h:[40,110],s:[.15,.6],v:[.3,.75],  tex:[.15,.8],note:'yuqori relyef, ikki tomonlama ajralish'},
+    {n:'Xlorit / serisit (o\'zgargan)',h:[80,160],s:[.15,.55],v:[.35,.8],tex:[.25,1],note:'ikkilamchi minerallar, alteratsiya'},
+    {n:'Karbonat (kalsit)',h:[0,360], s:[0,.2],  v:[.7,1],    tex:[0,.4],  note:'yuqori ikki nurlanish, romb ajralish'},
+    {n:'Ruda minerali (o\'tmas)',h:[0,360],s:[0,1],v:[0,.18], tex:[0,1],   note:'o\'tgan nurda qora, anshlifda aniqlanadi'},
+  ],
+  pol: [ // anshlif — qaytgan nurda
+    {n:'Pirit',            h:[40,65], s:[.15,.6],v:[.6,1],    tex:[0,.6],  note:'och sariq, yuqori qaytarish, izotrop'},
+    {n:'Xalkopirit',       h:[38,60], s:[.35,1], v:[.5,.95],  tex:[0,.7],  note:'to\'q sariq, zaif anizotrop'},
+    {n:'Galenit',          h:[0,360], s:[0,.12], v:[.65,1],   tex:[0,.5],  note:'oq, uchburchak yemirilish chuqurchalari'},
+    {n:'Sfalerit',         h:[0,40],  s:[.1,.45],v:[.25,.6],  tex:[.1,.8], note:'kulrang, ichki refleks'},
+    {n:'Arsenopirit',      h:[0,360], s:[0,.15], v:[.7,1],    tex:[0,.5],  note:'oq-sariq, kuchli anizotrop'},
+    {n:'Magnetit',         h:[0,360], s:[0,.15], v:[.3,.55],  tex:[0,.6],  note:'kulrang-jigarrang, izotrop'},
+    {n:'Gematit',          h:[0,25],  s:[.2,.7], v:[.3,.7],   tex:[.1,.8], note:'kulrang, qizil ichki refleks'},
+    {n:'Nometall (gangue)',h:[0,360], s:[0,1],  v:[0,.3],     tex:[0,1],   note:'to\'q kulrang massa — silikat asos'},
+  ]
+};
+
+const PALETTE = ['#4a9eff','#00c48c','#f2b544','#ff6b6b','#a78bfa','#22d3ee','#f472b6','#94a3b8','#84cc16'];
+
+let IMG1=null, IMG2=null, LAST=null;
+
+/* ---------- fayl yuklash ---------- */
+function bind(dropId, inpId, cb){
+  const d=document.getElementById(dropId), i=document.getElementById(inpId);
+  d.onclick=()=>i.click();
+  d.ondragover=e=>{e.preventDefault();d.classList.add('has')};
+  d.ondragleave=()=>d.classList.remove('has');
+  d.ondrop=e=>{e.preventDefault();if(e.dataTransfer.files[0])load(e.dataTransfer.files[0])};
+  i.onchange=e=>{if(e.target.files[0])load(e.target.files[0])};
+  function load(file){
+    const r=new FileReader();
+    r.onload=ev=>{const im=new Image();im.onload=()=>{d.classList.add('has');d.innerHTML=file.name+'<br><small>'+im.width+'×'+im.height+' px</small>';cb(im);check()};im.src=ev.target.result};
+    r.readAsDataURL(file);
+  }
+}
+bind('d1','f1',im=>IMG1=im);
+bind('d2','f2',im=>IMG2=im);
+
+document.getElementById('icp').oninput=e=>{
+  const n=parseICP(e.target.value).length;
+  document.getElementById('tagIcp').textContent=n+' ta element';
+  check();
+};
+function check(){
+  const m=document.getElementById('mode').value;
+  const ok = m==='geo' ? parseICP(document.getElementById('icp').value).length>0 : !!(IMG1||IMG2);
+  document.getElementById('run').disabled=!ok;
+}
+document.getElementById('mode').onchange=check;
+
+/* ---------- ICP parser ---------- */
+function parseICP(txt){
+  const out=[];
+  txt.split(/\n/).forEach(l=>{
+    const p=l.split(/[,;\t]/).map(s=>s.trim());
+    if(p.length<2) return;
+    const v=parseFloat(p[1].replace(',','.'));
+    if(!p[0]||isNaN(v)) return;
+    if(/element|oksid/i.test(p[0])) return;
+    out.push({el:p[0], val:v, unit:p[2]||(v>100?'ppm':'%')});
+  });
+  return out;
+}
+
+/* ---------- rang konvertatsiya ---------- */
+function rgb2hsv(r,g,b){
+  r/=255;g/=255;b/=255;
+  const mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn;
+  let h=0;
+  if(d){ if(mx===r) h=60*(((g-b)/d)%6); else if(mx===g) h=60*((b-r)/d+2); else h=60*((r-g)/d+4); }
+  if(h<0)h+=360;
+  return [h, mx?d/mx:0, mx];
+}
+
+/* ---------- k-means segmentatsiya ---------- */
+function segment(img, K){
+  const W=Math.min(img.width,520), H=Math.round(img.height*W/img.width);
+  const c=document.createElement('canvas'); c.width=W;c.height=H;
+  const g=c.getContext('2d',{willReadFrequently:true}); g.drawImage(img,0,0,W,H);
+  const px=g.getImageData(0,0,W,H), D=px.data;
+  const N=W*H;
+
+  // lokal tekstura: 3x3 gradient magnitudasi (normallashtirilgan)
+  const gray=new Float32Array(N), tex=new Float32Array(N);
+  for(let i=0;i<N;i++) gray[i]=(D[i*4]*.299+D[i*4+1]*.587+D[i*4+2]*.114)/255;
+  let tmax=1e-6;
+  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){
+    const i=y*W+x;
+    const gx=gray[i-1]-gray[i+1], gy=gray[i-W]-gray[i+W];
+    const m=Math.sqrt(gx*gx+gy*gy); tex[i]=m; if(m>tmax)tmax=m;
+  }
+  for(let i=0;i<N;i++) tex[i]/=tmax;
+
+  // xususiyat vektori: [r,g,b,tex*w]
+  const F=new Float32Array(N*4);
+  for(let i=0;i<N;i++){F[i*4]=D[i*4]/255;F[i*4+1]=D[i*4+1]/255;F[i*4+2]=D[i*4+2]/255;F[i*4+3]=tex[i]*0.8;}
+
+  // k-means++ boshlang'ich markazlar
+  const C=new Float32Array(K*4);
+  let seed=42; const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};
+  let idx=Math.floor(rnd()*N);
+  for(let d=0;d<4;d++) C[d]=F[idx*4+d];
+  const dist=new Float32Array(N).fill(1e9);
+  for(let k=1;k<K;k++){
+    let sum=0;
+    for(let i=0;i<N;i++){
+      let d2=0; for(let d=0;d<4;d++){const t=F[i*4+d]-C[(k-1)*4+d]; d2+=t*t;}
+      if(d2<dist[i]) dist[i]=d2; sum+=dist[i];
+    }
+    let t=rnd()*sum, acc=0, pick=0;
+    for(let i=0;i<N;i++){acc+=dist[i]; if(acc>=t){pick=i;break;}}
+    for(let d=0;d<4;d++) C[k*4+d]=F[pick*4+d];
+  }
+
+  // iteratsiyalar
+  const lab=new Uint8Array(N);
+  for(let it=0;it<14;it++){
+    const S=new Float64Array(K*4), cnt=new Float64Array(K);
+    for(let i=0;i<N;i++){
+      let best=0,bd=1e9;
+      for(let k=0;k<K;k++){
+        let d2=0; for(let d=0;d<4;d++){const t=F[i*4+d]-C[k*4+d]; d2+=t*t;}
+        if(d2<bd){bd=d2;best=k;}
+      }
+      lab[i]=best; cnt[best]++;
+      for(let d=0;d<4;d++) S[best*4+d]+=F[i*4+d];
+    }
+    for(let k=0;k<K;k++) if(cnt[k]) for(let d=0;d<4;d++) C[k*4+d]=S[k*4+d]/cnt[k];
+  }
+
+  // klaster statistikasi
+  const stats=[];
+  for(let k=0;k<K;k++){
+    let n=0,r=0,g2=0,b=0,tx=0;
+    for(let i=0;i<N;i++) if(lab[i]===k){n++;r+=D[i*4];g2+=D[i*4+1];b+=D[i*4+2];tx+=tex[i];}
+    if(!n) continue;
+    const R=r/n,G=g2/n,B=b/n, hsv=rgb2hsv(R,G,B);
+    stats.push({k, n, pct:n/N*100, rgb:[R,G,B], h:hsv[0], s:hsv[1], v:hsv[2], tex:tx/n});
+  }
+  stats.sort((a,b)=>b.pct-a.pct);
+  return {W,H,lab,stats,srcCanvas:c};
+}
+
+/* ---------- mineralga moslashtirish ---------- */
+function matchMineral(st, kind){
+  const list=REF[kind]||REF.thin;
+  let best=null, bestScore=-1;
+  list.forEach(m=>{
+    let sc=0;
+    // hue (aylanma)
+    const hIn = m.h[0]<=m.h[1] ? (st.h>=m.h[0]&&st.h<=m.h[1]) : (st.h>=m.h[0]||st.h<=m.h[1]);
+    sc += hIn?1:0;
+    sc += (st.s>=m.s[0]&&st.s<=m.s[1])?1.2:Math.max(0,1.2-3*Math.min(Math.abs(st.s-m.s[0]),Math.abs(st.s-m.s[1])));
+    sc += (st.v>=m.v[0]&&st.v<=m.v[1])?1.4:Math.max(0,1.4-3*Math.min(Math.abs(st.v-m.v[0]),Math.abs(st.v-m.v[1])));
+    sc += (st.tex>=m.tex[0]&&st.tex<=m.tex[1])?0.6:0;
+    if(sc>bestScore){bestScore=sc;best=m;}
+  });
+  const conf=Math.max(.28, Math.min(.94, bestScore/4.2));
+  return {name:best.n, note:best.note, conf};
+}
+
+/* ---------- geokimyo ---------- */
+function geochem(rows){
+  const g={}; rows.forEach(r=>g[r.el.toUpperCase().replace(/\s/g,'')]=r);
+  const get=k=>g[k]?g[k].val:null;
+  const si=get('SIO2'), na=get('NA2O'), k2=get('K2O'), al=get('AL2O3'),
+        ca=get('CAO'), mg=get('MGO'), fe=get('FE2O3')||get('FEO');
+  const out={rock:null, alk:null, ai:null, ci:null, ore:[], flags:[]};
+  if(si!=null){
+    const alk=(na||0)+(k2||0);
+    out.alk=alk.toFixed(2);
+    let name;
+    if(si<45) name='ultraasosli (ultramafik)';
+    else if(si<52) name = alk>5 ? 'ishqorli bazalt / gabbro' : 'bazalt / gabbro (asosli)';
+    else if(si<63) name = alk>7 ? 'trakiandezit / monsonit' : 'andezit / diorit (o\'rtacha)';
+    else if(si<69) name = alk>8 ? 'trakit / sienit' : 'dasit / granodiorit';
+    else name = alk>9 ? 'ishqorli granit' : 'riolit / granit (nordon)';
+    out.rock=name;
+    out.flags.push('TAS bo\'yicha dastlabki tasnif: SiO₂ '+si+' %, Na₂O+K₂O '+alk.toFixed(2)+' %');
+  }
+  if(al!=null&&na!=null&&k2!=null){
+    const A=al/101.96, N=na/61.98, K=k2/94.2, C=(ca||0)/56.08;
+    const ai=A/(N+K); const acnk=A/(C+N+K);
+    out.ai=ai.toFixed(2); out.ci=acnk.toFixed(2);
+    if(acnk>1.1) out.flags.push('A/CNK = '+acnk.toFixed(2)+' → peralyuminiy (S-tipdagi granitoidlarga xos)');
+    else if(ai<1) out.flags.push('A/NK = '+ai.toFixed(2)+' → peralkalin tendensiya');
+    else out.flags.push('A/CNK = '+acnk.toFixed(2)+' → metalyuminiy / I-tip');
+  }
+  [['CU','Mis',60],['AU','Oltin',0.05],['AG','Kumush',1],['PB','Qo\'rg\'oshin',30],
+   ['ZN','Rux',80],['MO','Molibden',3],['W','Volfram',3],['AS','Margimush',10],['SB','Surma',1]]
+   .forEach(([sym,nm,clark])=>{
+     const r=g[sym]; if(!r) return;
+     let v=r.val; if(/%/.test(r.unit)) v*=10000;
+     const kk=v/clark;
+     if(kk>=3) out.ore.push({el:nm, val:v, k:kk});
+   });
+  out.ore.sort((a,b)=>b.k-a.k);
+  return out;
+}
+
+/* ---------- render ---------- */
+function overlay(seg, colors){
+  const c=document.createElement('canvas'); c.width=seg.W;c.height=seg.H;
+  const g=c.getContext('2d'); const im=g.createImageData(seg.W,seg.H);
+  const map={}; colors.forEach((hex,i)=>{map[i]=[parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];});
+  for(let i=0;i<seg.W*seg.H;i++){
+    const rgb=map[seg.lab[i]]||[80,80,80];
+    im.data[i*4]=rgb[0];im.data[i*4+1]=rgb[1];im.data[i*4+2]=rgb[2];im.data[i*4+3]=255;
+  }
+  g.putImageData(im,0,0);
+  return c;
+}
+
+function confClass(c){return c>=.7?'c-hi':c>=.5?'c-md':'c-lo';}
+function confTxt(c){return c>=.7?'Yuqori':c>=.5?'O\'rta':'Past';}
+
+document.getElementById('run').onclick=()=>{
+  const btn=document.getElementById('run');
+  btn.innerHTML='<span class="spin"></span>Tahlil qilinmoqda…'; btn.disabled=true;
+  setTimeout(()=>{ try{ analyze(); } finally { btn.textContent='Tahlilni boshlash'; btn.disabled=false; } }, 60);
+};
+
+function analyze(){
+  const mode=document.getElementById('mode').value;
+  const K=+document.getElementById('kk').value;
+  const sid=document.getElementById('sid').value||'—';
+  const icpRows=parseICP(document.getElementById('icp').value);
+  const t0=performance.now();
+
+  let blocks=[], phases1=null, phases2=null, geo=null;
+
+  if((mode==='complex'||mode==='thin') && IMG1){
+    const seg=segment(IMG1,K);
+    const colors=seg.stats.map((_,i)=>PALETTE[i%PALETTE.length]);
+    const cmap={}; seg.stats.forEach((s,i)=>cmap[s.k]=colors[i]);
+    phases1=seg.stats.map((s,i)=>({...s, color:colors[i], ...matchMineral(s,'thin')}));
+    blocks.push({title:'Shlif — o\'tgan nurdagi segmentatsiya', seg, cmap, phases:phases1, src:IMG1});
+  }
+  if((mode==='complex'||mode==='pol') && IMG2){
+    const seg=segment(IMG2,K);
+    const colors=seg.stats.map((_,i)=>PALETTE[i%PALETTE.length]);
+    const cmap={}; seg.stats.forEach((s,i)=>cmap[s.k]=colors[i]);
+    phases2=seg.stats.map((s,i)=>({...s, color:colors[i], ...matchMineral(s,'pol')}));
+    blocks.push({title:'Anshlif — qaytgan nurdagi segmentatsiya', seg, cmap, phases:phases2, src:IMG2});
+  }
+  if((mode==='complex'||mode==='geo') && icpRows.length) geo=geochem(icpRows);
+
+  const ms=Math.round(performance.now()-t0);
+  LAST={sid,mode,phases1,phases2,geo,ms,icpRows};
+
+  // === HTML yig'ish ===
+  let h='';
+  h+='<div class="card"><h3>Tahlil xulosasi</h3><div class="grid2"><div>';
+  h+=kv('Namuna raqami',sid)+kv('Tahlil rejimi',{complex:'Kompleks',thin:'Shlif',pol:'Anshlif',geo:'ICP-MS'}[mode]);
+  h+=kv('Sana',new Date().toLocaleString('uz-UZ'))+kv('Ishlov vaqti',ms+' ms');
+  h+='</div><div>';
+  h+=kv('Aniqlangan fazalar',((phases1?phases1.length:0)+(phases2?phases2.length:0))+' ta');
+  h+=kv('ICP-MS elementlari',icpRows.length+' ta');
+  h+=kv('Litologik tasnif', geo&&geo.rock ? geo.rock : 'ICP kiritilmagan');
+  h+=kv('Model versiyasi','segm-kmeans v0.1');
+  h+='</div></div>';
+  h+='<div class="note"><b>Demo cheklovi:</b> ushbu prototipda fazalarni ajratish k-means klasterlash (rang + lokal tekstura) asosida, mineral nomlari esa optik xossalar reference jadvali orqali beriladi. O\'qitilgan CNN modeli 500+ ekspert tavsiflangan namuna asosida loyihaning 2-bosqichida integratsiya qilinadi. Barcha natijalar ekspert tasdig\'ini talab qiladi.</div></div>';
+
+  blocks.forEach(b=>{
+    const ov=overlay(b.seg, b.seg.stats.map((s,i)=>b.cmap[s.k]));
+    h+='<div class="card"><h3>'+b.title+'</h3><div class="grid2">';
+    h+='<div><div style="font-size:11px;color:#8b98a9;margin-bottom:6px">ASL TASVIR</div><canvas id="c_'+b.title.length+'_a"></canvas></div>';
+    h+='<div><div style="font-size:11px;color:#8b98a9;margin-bottom:6px">FAZA XARITASI</div><canvas id="c_'+b.title.length+'_b"></canvas></div>';
+    h+='</div><div style="margin-top:16px"><table><tr><th>Faza</th><th>Ehtimoliy mineral</th><th>Ulush, %</th><th>Ishonchlilik</th><th>Optik belgilar</th></tr>';
+    b.phases.forEach((p,i)=>{
+      h+='<tr><td><span class="sw" style="background:'+p.color+'"></span>F'+(i+1)+'</td>';
+      h+='<td><b>'+p.name+'</b></td>';
+      h+='<td style="min-width:110px">'+p.pct.toFixed(1)+'<div class="bar"><i style="width:'+Math.min(100,p.pct)+'%;background:'+p.color+'"></i></div></td>';
+      h+='<td><span class="conf '+confClass(p.conf)+'">'+confTxt(p.conf)+' '+(p.conf*100).toFixed(0)+'%</span></td>';
+      h+='<td style="color:#8b98a9;font-size:12px">'+p.note+'</td></tr>';
+    });
+    h+='</table></div></div>';
+    b._ids=['c_'+b.title.length+'_a','c_'+b.title.length+'_b']; b._ov=ov;
+  });
+
+  if(geo){
+    h+='<div class="card"><h3>Geokimyoviy tahlil (ICP-MS)</h3><div class="grid2"><div>';
+    h+=kv('Dastlabki tasnif',geo.rock||'—')+kv('Ishqorlar yig\'indisi',(geo.alk||'—')+' %');
+    h+=kv('A/NK',geo.ai||'—')+kv('A/CNK',geo.ci||'—');
+    h+='</div><div>';
+    if(geo.ore.length){
+      h+='<div style="font-size:12px;color:#8b98a9;margin-bottom:8px">MA\'DANLASHUV KO\'RSATKICHLARI (klark bo\'yicha konsentratsiya koeff.)</div>';
+      geo.ore.slice(0,6).forEach(o=>{h+='<div class="kv"><span>'+o.el+'</span><b>'+o.val.toFixed(1)+' ppm &nbsp;<span style="color:#00c48c">×'+o.k.toFixed(1)+'</span></b></div>';});
+    } else h+='<div style="color:#8b98a9;font-size:13px">Klarkdan sezilarli ortiq element aniqlanmadi.</div>';
+    h+='</div></div>';
+    geo.flags.forEach(f=>{h+='<div class="tag" style="display:block;margin-top:8px">'+f+'</div>';});
+    h+='</div>';
+  }
+
+  // matnli petrografik tavsif
+  h+='<div class="card"><h3>Avtomatik petrografik tavsif</h3><div class="txtrep">'+narrative(sid,phases1,phases2,geo)+'</div></div>';
+
+  document.getElementById('main').innerHTML=h;
+  blocks.forEach(b=>{
+    const a=document.getElementById(b._ids[0]), c=document.getElementById(b._ids[1]);
+    a.width=b.seg.W;a.height=b.seg.H;a.getContext('2d').drawImage(b.seg.srcCanvas,0,0);
+    c.width=b.seg.W;c.height=b.seg.H;c.getContext('2d').drawImage(b._ov,0,0);
+  });
+  document.getElementById('dl').disabled=false;
+  LAST.html=h;
+}
+
+function kv(k,v){return '<div class="kv"><span style="color:#8b98a9">'+k+'</span><b>'+v+'</b></div>';}
+
+function narrative(sid,p1,p2,geo){
+  let s='Namuna '+sid+'. ';
+  if(p1&&p1.length){
+    const maj=p1.filter(p=>p.pct>=10), min=p1.filter(p=>p.pct<10&&p.pct>=2);
+    s+='Shlifda o\'tgan nurda '+p1.length+' ta optik jihatdan farqlanuvchi faza ajratildi. ';
+    if(maj.length) s+='Asosiy tashkil etuvchilar: '+maj.map(p=>p.name.toLowerCase()+' ('+p.pct.toFixed(1)+' %)').join(', ')+'. ';
+    if(min.length) s+='Ikkilamchi darajadagi fazalar: '+min.map(p=>p.name.toLowerCase()+' ('+p.pct.toFixed(1)+' %)').join(', ')+'. ';
+    const tx=p1.reduce((a,p)=>a+p.tex*p.pct,0)/100;
+    s+='Tasvirning o\'rtacha tekstura indeksi '+tx.toFixed(2)+' bo\'lib, bu '+(tx>0.45?'donador, yaqqol kristall chegaralariga ega':'nisbatan bir jinsli, mayda donador')+' struktura ehtimolini ko\'rsatadi. ';
+  }
+  if(p2&&p2.length){
+    const maj=p2.filter(p=>p.pct>=5);
+    s+='Anshlifda qaytgan nurda '+p2.length+' ta faza aniqlandi';
+    if(maj.length) s+='; ular orasida '+maj.map(p=>p.name.toLowerCase()+' ('+p.pct.toFixed(1)+' %)').join(', ')+' ajralib turadi';
+    s+='. ';
+  }
+  if(geo){
+    if(geo.rock) s+='Geokimyoviy ma\'lumotlar bo\'yicha namuna '+geo.rock+' maydoniga tushadi. ';
+    geo.flags.forEach(f=>s+=f+'. ');
+    if(geo.ore.length) s+='Ma\'danlashuv nuqtai nazaridan '+geo.ore.slice(0,3).map(o=>o.el.toLowerCase()+' (klarkdan ×'+o.k.toFixed(1)+')').join(', ')+' bo\'yicha anomaliya qayd etildi, bu hududda '+(geo.ore[0].el==='Oltin'||geo.ore[0].el==='Kumush'?'gidrotermal ma\'danlashuv':'sulfid ma\'danlashuvi')+' ehtimolini ko\'rsatadi. ';
+  }
+  s+='\n\nXULOSA: yuqoridagi natijalar avtomatik tahlil asosida shakllantirildi va ekspert-petrograf tomonidan tasdiqlanishi lozim. Ishonchlilik darajasi past bo\'lgan fazalar uchun qo\'shimcha optik kuzatuv (360° pleoxroizm) va mikrozond tahlili tavsiya etiladi.';
+  return s;
+}
+
+/* ---------- hisobotni yuklab olish ---------- */
+document.getElementById('dl').onclick=()=>{
+  if(!LAST) return;
+  const doc='<!DOCTYPE html><html lang="uz"><head><meta charset="utf-8"><title>Petrolog AI hisobot — '+LAST.sid+'</title>'+
+    '<style>body{font-family:Georgia,serif;max-width:900px;margin:40px auto;padding:0 24px;color:#111;line-height:1.6}'+
+    'h1{font-size:22px;border-bottom:2px solid #333;padding-bottom:10px}h3{font-size:12px;letter-spacing:.6px;color:#555;text-transform:uppercase}'+
+    'table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #ccc;padding:7px;font-size:13px;text-align:left}'+
+    'th{background:#f2f2f2}.card{margin:26px 0}.kv{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:5px 0;font-size:13px}'+
+    '.sw,.bar,.conf{display:none}canvas{max-width:48%;border:1px solid #ccc}.note{background:#fff8e6;border-left:3px solid #d9a13b;padding:10px;font-size:12px}'+
+    '.txtrep{white-space:pre-wrap}.grid2{display:flex;gap:24px}.grid2>div{flex:1}.tag{display:block;font-size:12px;color:#444;margin:4px 0}</style></head><body>'+
+    '<h1>Petrolog AI — petrografik tahlil hisoboti</h1><p style="font-size:12px;color:#666">Namuna: <b>'+LAST.sid+'</b> · '+new Date().toLocaleString('uz-UZ')+' · Model: segm-kmeans v0.1 (demo)</p>'+
+    LAST.html.replace(/<canvas[^>]*><\/canvas>/g,'<p style="font-size:12px;color:#888">[tasvir — interaktiv versiyada]</p>')+
+    '<hr><p style="font-size:11px;color:#888">Ushbu hisobot Petrolog AI demo prototipi tomonidan avtomatik shakllantirildi. Ilmiy va ishlab chiqarish qarorlari uchun ekspert-petrograf tasdig\'i talab etiladi.</p></body></html>';
+  const b=new Blob([doc],{type:'text/html'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='Petrolog_AI_hisobot_'+LAST.sid+'.html'; a.click();
+};
+</script>
+</body>
+</html>
