@@ -11,7 +11,7 @@ A platform for analyzing microscopic shelf and anshelf images, ICP-MS geochemica
 
 ---
 
-## Muammo
+## Problem
 
 The volume of geological exploration in Uzbekistan is growing, but each shelf and anshelf is still characterized by hand:
 
