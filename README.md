@@ -1,6 +1,6 @@
 # Petrolog AI
 
-**Sun'iy intellekt asosida petrografik va petrologik tahlil platformasi**
+**A platform for petrographic and petrological analysis based on artificial intelligence**
 
 A platform for analyzing microscopic shelf and anshelf images, ICP-MS geochemical data, and 360° optical observations in a single multimodal system, forming a ready-made laboratory report.
 
