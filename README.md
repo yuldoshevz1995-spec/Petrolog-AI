@@ -2,10 +2,10 @@
 
 **Sun'iy intellekt asosida petrografik va petrologik tahlil platformasi**
 
-Mikroskop ostidagi shlif va anshlif tasvirlarini, ICP-MS geokimyoviy ma'lumotlarini va 360° optik kuzatuvlarni yagona multimodal tizimda tahlil qilib, tayyor laboratoriya hisobotini shakllantiruvchi platforma.
+A platform for analyzing microscopic shelf and anshelf images, ICP-MS geochemical data, and 360° optical observations in a single multimodal system, forming a ready-made laboratory report.
 
 🔗 **Jonli demo:** https://USERNAME.github.io/petrolog-ai/
-📄 Loyiha: President AI Award 2026 · Yo'nalish: sanoat va biznesda AI
+📄 Project: President AI Award 2026 · Direction: AI in industry and business
 
 > `USERNAME` o'rniga o'z GitHub foydalanuvchi nomingizni yozing.
 
@@ -13,87 +13,88 @@ Mikroskop ostidagi shlif va anshlif tasvirlarini, ICP-MS geokimyoviy ma'lumotlar
 
 ## Muammo
 
-O'zbekistonda geologik-qidiruv ishlari hajmi o'sib bormoqda, lekin har bir shlif va anshlif hanuzgacha qo'lda tavsiflanadi:
+The volume of geological exploration in Uzbekistan is growing, but each shelf and anshelf is still characterized by hand:
 
-- **Vaqt** — bitta namunaning to'liq petrografik tavsifi o'rtacha 3–5 ish kuni. H.M. Abdullayev nomidagi Geologiya va geofizika institutida 2024-yilda 1 800 ta, 2025-yilda 2 000 ta tahlil bajarildi.
-- **Subyektivlik** — bir xil shlifni ikki mutaxassis turlicha tavsiflaydi; natijalar takrorlanuvchan emas.
-- **Parchalanganlik** — shlif tasviri, anshlif, ICP-MS jadvali va ekspert xulosasi hech qachon bitta bazaga birlashtirilmaydi.
+- **Time** - A complete petrographic description of a single sample takes an average of 3–5 working days. At the Kh.M. Abdullaev Institute of Geology and Geophysics, 1,800 analyses were performed in 2024, and 2,000 in 2025.
+- **Subjectivity** - two specialists describe the same slip differently; results are not reproducible.
+- **Fragmentation** - the shelf image, anshlif, ICP-MS table, and expert opinion are never combined into a single database.
 
-## Yechim
+No. Solution
 
-To'rtta manbadan kelgan ma'lumot bitta AI konveyerida qayta ishlanadi:
+Data from four sources is processed on a single AI assembly line:
 
-| Kirish ma'lumoti | AI nima qiladi | Chiqish |
+| Input | What AI does | Output |
 |---|---|---|
-| Shlif tasviri (o'tgan nur) | Mineral fazalarni segmentatsiyalash, tekstura tahlili | Mineral tarkib, % nisbat |
-| Anshlif tasviri (qaytgan nur) | Ma'dan minerallarini tanish | Ruda mineralogiyasi |
-| ICP-MS jadvali | Geokimyoviy tasnif, klark koeffitsiyentlari | Petrogenetik talqin |
-| 360° pleoxroizm videosi | Optik xossalar o'zgarishini qayd etish | Identifikatsiyani tasdiqlash |
+| Shelf image (passed beam) | Segmentation of mineral phases, texture analysis | Mineral composition, % ratio |
+| Anschlieff image (reflected light) | Recognition of ore minerals | Ore mineralogy |
+| ICP-MS table | Geochemical classification, Clark coefficients | Petrogenetic interpretation |
+| 360° pleochroism video | Optical property change recording | Identification confirmation |
 
-Foydalanuvchi to'rtta rejimdan birini tanlaydi: shlif tavsifi, anshlif tavsifi, ICP tahlili yoki **kompleks tahlil**. Kompleks rejimda barcha manbalar birga qayta ishlanib, yagona standartlashtirilgan hisobot shakllanadi.
-
----
-
-## Ushbu repozitoriyda nima bor
-
-Bu — platformaning **ishlaydigan demo prototipi** (`index.html`). Bitta faylda, serversiz, to'liq brauzer ichida ishlaydi.
-
-**Demo nimani ko'rsatadi:**
-
-1. Shlif va/yoki anshlif tasvirini yuklash
-2. Fazalarni avtomatik ajratish — k-means klasterlash (RGB + lokal tekstura gradiyenti bo'yicha 4D xususiyat vektori, k-means++ initsializatsiyasi)
-3. Har bir fazani optik xossalar reference jabvali orqali ehtimoliy mineral bilan moslashtirish va **ishonchlilik darajasi** berish
-4. Faza xaritasini vizuallashtirish va foizli tarkibni hisoblash
-5. ICP-MS ma'lumotlarini tahlil qilish — TAS bo'yicha dastlabki tasnif, A/CNK va A/NK indekslari, klark koeffitsiyentlari bo'yicha ma'danlashuv anomaliyalari
-6. Avtomatik matnli petrografik tavsif generatsiyasi
-7. Hisobotni yuklab olish
-
-### Demo cheklovlari — ochiq aytamiz
-
-Ushbu bosqichda **o'qitilgan neyron tarmoq ishlatilmaydi.** Segmentatsiya klasterlash algoritmiga, mineral nomlari esa reference jadvalga asoslangan.
-
-Sababi oddiy: CNN modelini o'qitish uchun ekspert tomonidan tavsiflangan etalon dataset kerak, u esa loyihaning birinchi bosqichida yaratiladi. Demo **konveyerning uchdan-uchgacha ishlashini** isbotlaydi — aniqlik dataset bilan keladi.
-
-Loyihaning asosiy ustunligi texnologiyada emas, **ma'lumotda**: CNN arxitekturasini har kim yozadi, O'zbekiston tog' jinslari bo'yicha ekspert tavsiflangan 5 000+ tahlil natijasiga esa mamlakatda boshqa hech kim ega emas.
+The user chooses one of four modes: shrift description, anshrift description, ICP analysis, or **comprehensive analysis**. In integrated mode, all sources are processed together to generate a unified standardized report.
 
 ---
 
-## Yo'l xarita
+No. What is in this repository?
 
-| Bosqich | Muddat | Natija | KPI |
+This is a **running demo prototype** of the platform ('index.html'). One file, server-free, fully in-browser.
+
+**What the demo shows:**
+
+1. Upload a shelf and/or anshelf image
+2. Automatic phase separation - k-means clustering (RGB + 4D feature vector on local texture gradient, k-means++ initialization)
+3. Match each phase with a possible mineral using an optical properties reference table and provide a **confidence level**.
+4. Visualization of the phase map and calculation of the percentage content.
+5. Analysis of ICP-MS data - preliminary classification according to TAS, mineralization anomalies according to A/CNK and A/NK indices, and Clark coefficients.
+6. Automatic text petrographic description generation.
+7. Download the report
+
+### Demo restrictions — we speak openly
+
+**No trained neural network is used in this step.** Segmentation is based on a clustering algorithm, and mineral names are based on a reference table.
+
+The reason is simple: training the CNN model requires an expert-described reference dataset, which is created during the first stage of the project. The demo demonstrates **three-to-three conveyor** performance — accuracy comes with a dataset.
+
+The main advantage of the project lies not in technology, but in **data**: anyone can write CNN's architecture, and no one else in the country has 5,000+ analysis results describing the rocks of Uzbekistan by an expert.
+
+---
+
+No. Road map
+
+| Stage | Timeframe | Result | KPI |
 |---|---|---|---|
-| Dataset yadrosi | 1–3-oy | 20+ ilmiy hisobotni raqamlashtirish, annotatsiya reglamenti | ≥1 500 annotatsiyalangan tasvir |
-| Birinchi model | 4–6-oy | Segmentatsiya + klassifikatsiya modelini o'qitish | Asosiy jinshosil minerallar bo'yicha F1 ≥ 0,75 |
-| Yopiq beta | 7–9-oy | Institut laboratoriyasida real ish oqimida sinov | ≥300 namuna tizim orqali o'tkazilgan |
-| Pilot mijoz | 10–12-oy | Sanoat korxonasida pilot joriy etish | ≥1 shartnoma; vaqt tejash ≥60% |
+| Dataset kernel | 1-3 months | Digitization of 20+ scientific reports, annotation regulations | ≥1,500 annotated images |
+| First model | 4-6 months | Segmentation + classification model training | F1 ≥ 0.75 for the main rock-forming minerals |
+| Closed beta | 7–9 months | Real workflow testing in the institute's laboratory | ≥300 samples conducted through the system |
+| Pilot client | 10-12 months | Industrial pilot implementation | ≥1 contract; time savings ≥60% |
 
-Aniqlik bo'yicha yakuniy maqsadli ko'rsatkich pilot dataset natijalaridan keyin belgilanadi.
+The final target for accuracy will be set after the results of the pilot dataset.
 
-## Rejalashtirilgan texnologik stack
+No. Planned technological stack
 
-- **Model:** Python / PyTorch — segmentatsiya (U-Net / SegFormer sinfi), klassifikatsiya (CNN + confidence), transfer learning
+- **Model:** Python / PyTorch - segmentation (U-Net / SegFormer class), classification (CNN + confidence), transfer learning
 - **Backend:** FastAPI
 - **Frontend:** React
-- **Ma'lumotlar:** PostgreSQL + obyekt saqlash
-- **Yetkazish:** Docker (on-premise variant maxfiylik talabi yuqori mijozlar uchun)
+- **Data:** PostgreSQL + Object Storage
+- **Shipping:** Docker (on-premise option for clients with high privacy requirements)
 
-**Human-in-the-loop majburiy:** ishonchlilik chegarasidan past natija «ekspert tekshiruvi zarur» belgisini oladi va hech qachon avtomatik tasdiqlanmaydi. Har bir ekspert tuzatishi keyingi o'qitish siklida datasetga qaytadi.
+**Human-in-the-loop required:** a result below the confidence threshold is labeled "expert review required" and is never automatically verified. Each expert correction returns to the dataset in the next training cycle.
+
 
 ---
 
-## Ishga tushirish
+No. Launch
 
-Hech qanday o'rnatish talab qilinmaydi:
+No installation required:
 
-```bash
+" 'bash
 git clone https://github.com/USERNAME/petrolog-ai.git
-cd petrolog-ai
-# index.html faylini brauzerda oching
-```
+cd petrologist-ai
+Open index.html # in your browser
+" '
 
-Yoki jonli demo: https://USERNAME.github.io/petrolog-ai/
+Or a live demo: https://USERNAME.github.io/petrolog-ai/
 
-Sinash uchun istalgan shlif mikrofotosuratini yuklang va ICP-MS maydoniga namuna ma'lumot kiriting:
+Upload a micrograph of any shelf to test and enter sample data in the ICP-MS field:
 
 ```
 SiO2,62.4,%
@@ -109,13 +110,14 @@ Au,0.8,ppm
 
 ---
 
-## Jamoa
+No. Team
 
-Ilmiy yadro — H.M. Abdullayev nomidagi Geologiya va geofizika instituti: 1 nafar fan doktori va 5 nafar geologiya-mineralogiya fanlari falsafa doktori. NKMK, OKMK va «O'zbekgeologiya qidiruv» AJ bilan mineralogik-petrografik yo'nalishda hamkorlik tajribasi.
+Scientific core - H.M. Abdullaev Institute of Geology and Geophysics: 1 Doctor of Science and 5 Doctors of Philosophy in Geological and Mineralogical Sciences. Experience of cooperation in the mineralogical and petrographic direction with NMMC, AMMC and JSC "Uzbekgeologiya qidiruv."
 
-## Strategik asos
+No. Strategic Framework
 
-Loyiha O'zbekiston Respublikasi Prezidentining «Sun'iy intellekt texnologiyalarini 2030-yilgacha rivojlantirish strategiyasi» hamda PF-189-son Farmonining sun'iy intellektni iqtisodiyotning ustuvor tarmoqlariga joriy etish yo'nalishiga mos keladi.
+The project corresponds to the "Strategy for the Development of Artificial Intelligence Technologies until 2030" of the President of the Republic of Uzbekistan and the direction of the Decree No. PF-189 on the introduction of artificial intelligence in priority sectors of the economy.
+
 
 ---
 
@@ -131,8 +133,3 @@ Submitted to **President AI Award 2026** (Uzbekistan), industry & business AI tr
 
 ---
 
-## Litsenziya
-
-Demo prototip kodi — MIT litsenziyasi (`LICENSE` fayliga qarang).
-
-Loyihaning ma'lumotlar bazasi, ekspert annotatsiyalari va o'qitilgan model vaznlari MIT doirasiga **kirmaydi** va alohida intellektual mulk obyektlari hisoblanadi.
