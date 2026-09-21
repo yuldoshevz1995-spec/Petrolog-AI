@@ -1,0 +1,6 @@
+numpy>=1.24
+opencv-python-headless>=4.8
+matplotlib>=3.7
+pytest>=7.4
+# External program (not a Python package): Tesseract OCR >= 4.1
+#   Windows: https://github.com/UB-Mannheim/tesseract/wiki   Linux: apt install tesseract-ocr
